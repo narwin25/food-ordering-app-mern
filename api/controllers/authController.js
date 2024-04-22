@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -16,12 +16,12 @@ export const register = async (req, res) => {
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    next(err);
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -37,7 +37,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({ message: "User logged in successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(err);
   }
 };
 
