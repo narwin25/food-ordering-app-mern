@@ -10,12 +10,13 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
-export const getUserById = async (req, res, next) => {
+export const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return next(errorHandler(404, "User not found"));
 
-    res.json(user);
+    const { password: pass, ...info } = user._doc;
+    res.status(200).json(info);
   } catch (err) {
     next(err);
   }
@@ -23,12 +24,20 @@ export const getUserById = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return next(errorHandler(404, "User not found"));
+    const { id } = req.params;
+    if (req.user.id !== id) return next(errorHandler(403, "Unauthorized"));
 
-    user.email = req.body.email;
-    const updatedUser = await user.save();
-    res.json(updatedUser);
+    if (req.body.password)
+      req.body.password = bcrypt.hashSync(req.body.password, 10);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    const { password: pass, ...info } = updateUser._doc;
+    res.status(200).json(info);
   } catch (err) {
     next(err);
   }
@@ -36,8 +45,12 @@ export const updateUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.status(204).end();
+    const { id } = req.params;
+    if (req.user.id !== id) return next(errorHandler(403, "Unauthorized"));
+
+    await User.findByIdAndDelete(id);
+    res.clearCookie("accessToken");
+    res.status(204).json({ message: "User has been deleted" });
   } catch (err) {
     next(err);
   }
