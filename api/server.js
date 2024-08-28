@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRoute.js";
 import userRouter from "./routes/userRoute.js";
+import restaurantRouter from "./routes/restaurantRoute.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/restaurant", restaurantRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

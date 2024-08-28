@@ -15,7 +15,7 @@ const restaurantSchema = new mongoose.Schema({
   restaurantName: { type: String, required: true },
   location: { type: String, required: true },
   menus: [menuSchema],
-  images: { type: String, required: true },
+  // images: { type: String, required: true },
   lastUpdated: { type: Date, required: true },
 });
 
